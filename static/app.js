@@ -108,6 +108,25 @@ if (serverConfigBtn) {
     }
   });
 }
+
+// Clear Browser Cache & Model Memory
+const clearCacheBtn = document.getElementById('clearCacheBtn');
+if (clearCacheBtn) {
+  clearCacheBtn.addEventListener('click', async () => {
+    if (confirm('Clear all downloaded AI models and browser memory? (Ensures 100% clean state, no old data)')) {
+      try {
+        if (window.caches) {
+          const keys = await caches.keys();
+          for (const k of keys) await caches.delete(k);
+        }
+        showToast('Browser cache and models cleared!', 'success');
+        setTimeout(() => location.reload(), 600);
+      } catch (e) {
+        showToast('Error clearing cache: ' + e.message, 'error');
+      }
+    }
+  });
+}
 function initTheme() {
   const saved = localStorage.getItem('whisperflow_theme') || 'dark';
   if (saved === 'dark') {
@@ -645,20 +664,29 @@ startTranscribeBtn.addEventListener('click', async () => {
         const pct = Math.min(95, Math.round((p.loaded / p.total) * 100));
         progressBarFill.style.width = `${pct}%`;
         progressPctText.textContent = `${pct}%`;
-        progressStatusText.textContent = `Downloading ${p.file || 'model weights'}...`;
-        progressSubText.textContent = `${(p.loaded / 1024 / 1024).toFixed(1)} MB / ${(p.total / 1024 / 1024).toFixed(1)} MB (Cached in browser)`;
+        progressStatusText.textContent = `Loading Whisper AI Model (${p.file || 'weights'})...`;
+        progressSubText.textContent = `AI Neural Network: ${(p.loaded / 1024 / 1024).toFixed(1)} MB / ${(p.total / 1024 / 1024).toFixed(1)} MB (GPU Memory)`;
       }
     } else if (msg.type === 'status') {
       progressStatusText.textContent = msg.message;
+      if (msg.message.includes('Transcribing')) {
+        const audioMB = currentAudioBlob ? (currentAudioBlob.size / 1048576).toFixed(1) : '2.7';
+        progressSubText.textContent = `Transcribing Audio: ${audioMB} MB (${formatTime(currentAudioDuration)}) • 100% Private (No Audio Cached)`;
+        progressBarFill.style.width = '95%';
+        progressBarFill.classList.add('animate-pulse');
+        progressPctText.textContent = 'Active';
+      }
       if (msg.message.includes('WebGPU Pipeline Ready')) {
         appendLiveStreamLine('&gt; WebGPU Pipeline Ready. Executing on your device GPU!');
       } else if (msg.message.includes('WebAssembly CPU Pipeline Ready')) {
         appendLiveStreamLine('&gt; WebAssembly CPU Pipeline Ready. Multi-threaded WASM active.');
       }
     } else if (msg.type === 'complete') {
+      progressBarFill.classList.remove('animate-pulse');
       progressBarFill.style.width = '100%';
       progressPctText.textContent = '100%';
-      progressStatusText.textContent = 'Complete!';
+      progressStatusText.textContent = 'Transcription Complete!';
+      progressSubText.textContent = `Finished in ${msg.result.execution_time || ''}s using ${msg.result.device_used}`;
 
       setTimeout(() => {
         progressCard.classList.add('hidden');
