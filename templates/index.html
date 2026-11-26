@@ -3,7 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WhisperFlow | In-Browser AI YouTube & Audio Transcriber</title>
+  
+  <!-- Primary SEO Meta Tags -->
+  <title>Online YouTube Transcriber | Transcribe YouTube URLs & Upload MP3, WAV, MP4 to Text</title>
+  <meta name="title" content="Online YouTube Transcriber | Transcribe YouTube URLs & Upload MP3, WAV, MP4 to Text">
+  <meta name="description" content="Free Online YouTube Transcriber & Audio-to-Text Converter. Transcribe YouTube videos, audio URLs, or upload MP3, WAV, M4A, MP4 directly in your browser. Powered by client GPU (WebGPU) & CPU. 100% private, unlimited, export to SRT, VTT, TXT, JSON.">
+  <meta name="keywords" content="online youtube transcriber, youtube transcriber, transcribe youtube to text, youtube url transcriber, upload mp3 to text, upload wav to text, audio to text converter, video to srt, speech to text online, free audio transcriber, whisper webgpu, client side whisper, audio url transcriber">
+  <meta name="author" content="WhisperFlow">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://umeshkumar20540-oss.github.io/youtube-transcriber/">
+
+  <!-- Open Graph / Facebook Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://umeshkumar20540-oss.github.io/youtube-transcriber/">
+  <meta property="og:title" content="Online YouTube Transcriber | Transcribe URLs, MP3, WAV to Text (Free)">
+  <meta property="og:description" content="Free In-Browser YouTube & Audio Transcriber. Transcribe YouTube links, audio URLs, or upload MP3, WAV, M4A files on your GPU and CPU with zero server uploads.">
+  <meta property="og:image" content="https://img.youtube.com/vi/jNQXAC9IVRw/maxresdefault.jpg">
+
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://umeshkumar20540-oss.github.io/youtube-transcriber/">
+  <meta name="twitter:title" content="Online YouTube Transcriber | Transcribe URLs, MP3, WAV to Text (Free)">
+  <meta name="twitter:description" content="Free In-Browser YouTube & Audio Transcriber. Transcribe YouTube links, audio URLs, or upload MP3, WAV, M4A files on your GPU and CPU with zero server uploads.">
+  <meta name="twitter:image" content="https://img.youtube.com/vi/jNQXAC9IVRw/maxresdefault.jpg">
+
+  <!-- Structured Data (JSON-LD) for Search Engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Online YouTube Transcriber & Audio-to-Text Converter",
+    "alternateName": ["WhisperFlow", "Online YouTube Transcriber", "YouTube Audio to Text", "MP3 WAV Transcriber"],
+    "url": "https://umeshkumar20540-oss.github.io/youtube-transcriber/",
+    "description": "Free online speech-to-text transcriber for YouTube videos, audio URLs, and audio file uploads (MP3, WAV, M4A, MP4) running locally on client GPU and CPU.",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Any (Web Browser with WebGPU or WebAssembly)",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Transcribe YouTube video URLs directly",
+      "Upload MP3, WAV, M4A, AAC, MP4, WebM audio and video files",
+      "Live microphone voice recording & transcription",
+      "Runs 100% in-browser on client GPU (WebGPU) and CPU (WASM)",
+      "Export to Subtitles (.srt), WebVTT (.vtt), Timestamped Text (.txt), JSON, CSV, Markdown",
+      "Synchronized karaoke audio playback and segment seeking",
+      "Offline AI summary and timeline chapter generation"
+    ]
+  }
+  </script>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -46,10 +97,10 @@
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">WhisperFlow</span>
-            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">Client GPU &amp; CPU</span>
+            <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Online YouTube Transcriber</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">Free &amp; Unlimited</span>
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400">100% In-Browser Private Speech Transcription</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Transcribe YouTube URLs, MP3, WAV, &amp; MP4 on your GPU/CPU</p>
         </div>
       </div>
 
@@ -87,6 +138,16 @@
   <!-- Main Content Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
+    <!-- SEO Hero Headline Section -->
+    <div class="text-center sm:text-left">
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        Free Online YouTube Transcriber &amp; Audio-to-Text Converter
+      </h1>
+      <p class="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed">
+        Paste any <strong>YouTube URL</strong> or video link, or <strong>upload MP3, WAV, M4A, &amp; MP4</strong> files for instant speech-to-text. Powered by in-browser <strong>OpenAI Whisper</strong> with <strong>WebGPU</strong> hardware acceleration. 100% private, free, and runs entirely on your device GPU and CPU.
+      </p>
+    </div>
+
     <!-- Privacy & Hardware Banner -->
     <div class="bg-gradient-to-r from-brand-500/10 via-purple-500/10 to-indigo-500/10 border border-brand-500/20 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center space-x-3.5">
@@ -117,15 +178,15 @@
         <div class="flex flex-wrap gap-2">
           <button id="tabYoutube" class="px-4 py-2 rounded-lg text-sm font-semibold bg-brand-600 text-white flex items-center space-x-2 transition">
             <i data-lucide="youtube" class="w-4 h-4 text-red-300"></i>
-            <span>YouTube URL</span>
+            <span>YouTube &amp; Video URLs</span>
           </button>
           <button id="tabLocal" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-800 flex items-center space-x-2 transition">
             <i data-lucide="upload-cloud" class="w-4 h-4"></i>
-            <span>Upload File</span>
+            <span>Upload MP3, WAV, MP4</span>
           </button>
           <button id="tabMic" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-surface-800 flex items-center space-x-2 transition">
             <i data-lucide="mic" class="w-4 h-4"></i>
-            <span>Record Mic</span>
+            <span>Record Microphone</span>
           </button>
         </div>
         <span class="text-xs text-slate-400 dark:text-slate-500 hidden sm:inline">Transformers.js In-Browser Inference</span>
@@ -429,6 +490,154 @@
         </div>
       </div>
     </div>
+
+    <!-- SEO Content, Features & FAQ Section (For Search Engine Indexing & Ranking) -->
+    <section class="mt-16 pt-12 border-t border-slate-200 dark:border-slate-800/80 space-y-12">
+      <!-- 3-Step How-To Guide -->
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-6 text-center sm:text-left">
+          How to Transcribe YouTube Videos &amp; Audio to Text Online
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-6 rounded-2xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-500 font-bold flex items-center justify-center text-base">
+              1
+            </div>
+            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Choose URL or Audio File</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Paste a <strong>YouTube video URL</strong> or drag and drop your local audio/video file (<strong>MP3, WAV, M4A, MP4, WebM</strong>). You can also record voice directly from your microphone.
+            </p>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-500 font-bold flex items-center justify-center text-base">
+              2
+            </div>
+            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Select Whisper Model &amp; GPU</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Choose your desired OpenAI Whisper model size (Tiny, Base, Small). Our system automatically engages your physical <strong>GPU via WebGPU</strong> or falls back to multi-threaded CPU.
+            </p>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-500 font-bold flex items-center justify-center text-base">
+              3
+            </div>
+            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Review, Seek &amp; Export</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Play synchronized audio with active karaoke subtitles, read the AI summary, and download your transcript in <strong>SRT, WebVTT, TXT, JSON, CSV, or Markdown</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Comparison & Highlights Grid -->
+      <div class="bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          Why WhisperFlow is the Best Free Online YouTube Transcriber
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2 text-brand-500 font-semibold text-sm">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>100% Private &amp; Local</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Unlike cloud services that store your files on external servers, all speech processing happens directly inside your web browser.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2 text-brand-500 font-semibold text-sm">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>Hardware Accelerated</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Harnesses WebGPU for direct hardware graphics acceleration on NVIDIA, AMD, Intel, and Apple Silicon chips.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2 text-brand-500 font-semibold text-sm">
+              <i data-lucide="file-check" class="w-4 h-4"></i>
+              <span>All Major Formats</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Supports YouTube URLs, YouTube Shorts, MP3, WAV, M4A, AAC, MP4, WebM, FLAC, and OGG with Web Audio API decoding.
+            </p>
+          </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center space-x-2 text-brand-500 font-semibold text-sm">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Unlimited Free Exports</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Export professional subtitle files (SRT, VTT) for Premiere, DaVinci, and YouTube Studio, plus TXT, JSON, CSV, and Markdown.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="space-y-6">
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          Frequently Asked Questions (FAQ)
+        </h2>
+        <div class="space-y-4">
+          <div class="p-5 rounded-xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 space-y-2">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">
+              Is this online YouTube transcriber free to use?
+            </h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Yes, WhisperFlow is 100% free with no subscription, no sign-up, and no credit card required. Because it runs on your device's GPU and CPU, there are no server costs or artificial audio length caps.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 space-y-2">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">
+              Can I upload MP3, WAV, and MP4 files directly?
+            </h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Absolutely. You can drag and drop any audio or video file including MP3, WAV, M4A, AAC, MP4, WebM, and FLAC. The audio track is decoded in real time using the browser's Web Audio API.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 space-y-2">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">
+              How does client GPU and CPU transcription work?
+            </h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Using Hugging Face Transformers.js and ONNX Runtime Web, the OpenAI Whisper neural network is compiled directly into WebGPU compute shaders that execute on your graphics card. If WebGPU is not supported by your browser, it automatically runs across your CPU cores via multi-threaded WebAssembly (WASM).
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-white dark:bg-surface-900 border border-slate-200 dark:border-slate-800 space-y-2">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">
+              How do I export subtitles for YouTube, Premiere Pro, or DaVinci Resolve?
+            </h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Once transcription completes, click the "Export As..." button and select Subtitles (.srt) or WebVTT (.vtt). You can also export timestamped plain text, JSON with segment bounds, CSV spreadsheets, and structured Markdown notes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-8 pb-12 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-500 dark:text-slate-400 space-y-2">
+      <p>
+        <strong>Online YouTube Transcriber</strong> &bull; Powered by Whisper AI, WebGPU &amp; WebAssembly &bull; Free &amp; Open Source
+      </p>
+      <p>
+        <a href="https://github.com/umeshkumar20540-oss/youtube-transcriber" target="_blank" rel="noopener noreferrer" class="hover:text-brand-500 transition underline underline-offset-4">
+          GitHub Repository
+        </a>
+        &bull;
+        <span>MIT License</span>
+      </p>
+    </footer>
+
   </main>
 
   <!-- History Drawer (Slide-over) -->
@@ -463,7 +672,7 @@
   </div>
 
   <!-- App Script -->
-  <script src="/static/app.js?v=3.0"></script>
+  <script src="/static/app.js?v=3.1"></script>
   <script>
     lucide.createIcons();
   </script>

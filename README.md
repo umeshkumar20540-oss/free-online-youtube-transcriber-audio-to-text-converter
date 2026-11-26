@@ -1,37 +1,37 @@
-# 🎙️ WhisperFlow: In-Browser AI YouTube & Audio Transcriber
+# 🎙️ Online YouTube Transcriber & Audio-to-Text Converter (URLs, MP3, WAV, MP4)
 
-[![GitHub Pages](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-6366f1?style=for-the-badge&logo=github)](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
+[![GitHub Pages](https://img.shields.io/badge/Live%20App-Online%20YouTube%20Transcriber-6366f1?style=for-the-badge&logo=github)](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
 [![WebGPU](https://img.shields.io/badge/Hardware-WebGPU%20%2B%20WASM-10b981?style=for-the-badge&logo=webassembly)](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 > **🚀 Live Web App**: [https://umeshkumar20540-oss.github.io/youtube-transcriber/](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
 
-**WhisperFlow** is a modern, high-performance speech transcription application that runs **100% directly in your browser on your own GPU and CPU** using **Transformers.js (ONNX Runtime Web)** and **WebGPU**. 
+**Online YouTube Transcriber** is a free, high-performance web application for converting **YouTube URLs, video links, and audio uploads (MP3, WAV, M4A, MP4)** to text **100% directly inside your browser on your own GPU and CPU** using **Transformers.js (ONNX Runtime Web)** and **WebGPU**.
 
-Audio and speech data **never leave your device**. No servers, no API keys, and no subscription fees required.
+Audio and speech data **never leave your device**. No servers, no sign-ups, and no limits.
 
 ---
 
 ## ⚡ Highlights & Key Capabilities
 
+- **YouTube URL & Audio Link Ingestion**:
+  - Transcribe YouTube videos, YouTube Shorts, and online media URLs.
+  - Automatic thumbnail, title, and channel metadata preview.
+- **Upload Any Audio or Video File (MP3, WAV, M4A, MP4, WebM, FLAC)**:
+  - Drag-and-drop or select any file format. Client-side decoding via Web Audio API.
 - **Client GPU & CPU Acceleration**:
-  - **WebGPU**: Automatically utilizes your physical NVIDIA, AMD, Intel, or Apple Silicon GPU for fast parallel inference.
-  - **WebAssembly (WASM SIMD)**: Multi-threaded CPU fallback ensuring compatibility across every modern browser.
-- **Privacy First (Zero Server Data Transfer)**:
-  - Speech decoding and audio transformations happen in client-side memory using the Web Audio API and Web Workers.
-- **Multiple Audio Sources**:
-  - **YouTube URL**: Instant metadata preview, thumbnail extraction, and audio stream resolution.
-  - **Local Audio/Video Upload**: Drag & drop MP3, WAV, M4A, AAC, MP4, WebM, FLAC, and OGG.
-  - **Live Microphone Recording**: Record spoken audio directly from your microphone with live waveform tracking.
-  - **1-Click Test Demo**: Pre-bundled sample audio to test transcription speed with zero setup.
+  - **WebGPU**: Automatically utilizes physical NVIDIA, AMD, Intel, or Apple Silicon GPUs for fast parallel inference.
+  - **WebAssembly (WASM SIMD)**: Multi-threaded CPU fallback for universal browser compatibility.
+- **100% Private (Zero Data Uploads)**:
+  - Inference executes entirely in your browser's local memory. Your audio never touches third-party servers.
 - **Live Recognition Terminal**:
-  - Real-time display of decoded segments streaming onto a terminal console as your hardware processes speech.
+  - Real-time display of decoded speech segments streaming onto a terminal console as your hardware processes audio.
 - **Synchronized Karaoke Player**:
   - Click any segment or timestamp to seek playback to that exact second.
   - Dynamic karaoke highlighting automatically illuminates the active sentence as audio plays.
   - Adjustable playback speed (1x, 1.25x, 1.5x, 2x).
 - **Client-Side AI Summary & Chapters**:
-  - Offline TF-IDF extractive summarization generates executive bullet points, top keywords, and timestamped chapter markers without cloud APIs.
+  - Offline TF-IDF extractive summarization generates executive bullet points, key topics, and timestamped chapter markers without cloud APIs.
 - **Multi-Format Subtitle & Text Exports**:
   - **SRT** (`.srt` SubRip Subtitles for Premiere Pro, DaVinci Resolve, VLC)
   - **WebVTT** (`.vtt` for HTML5 video)
@@ -50,7 +50,7 @@ Audio and speech data **never leave your device**. No servers, no API keys, and 
 Open the live URL in any modern browser (Chrome, Edge, Brave, Arc, Safari, Firefox):
 👉 **[https://umeshkumar20540-oss.github.io/youtube-transcriber/](https://umeshkumar20540-oss.github.io/youtube-transcriber/)**
 
-1. Click **"1-Click Test Demo"** or upload an audio file / paste a YouTube link.
+1. Paste a **YouTube URL**, drop an **MP3 / WAV / MP4 file**, or click **"1-Click Test Demo"**.
 2. Select your desired Whisper model (`Tiny`, `Base`, or `Small`).
 3. Click **"Start Transcription"**.
 4. Your device's GPU (via WebGPU) or CPU (via WASM) will transcribe the speech locally in seconds!
@@ -93,14 +93,14 @@ python cli.py "sample.mp3" --model small --format all --output-dir ./transcripts
 
 ```
 youtube-transcriber/
-├── index.html                # GitHub Pages static entrypoint
+├── index.html                # GitHub Pages static entrypoint (SEO optimized)
 ├── static/
 │   ├── app.js               # Client controller (WebGPU detection, UI, export, history)
 │   ├── worker.js            # Transformers.js in-browser WebGPU/WASM Whisper worker
 │   ├── styles.css           # Custom styling, karaoke highlights, scrollbars
 │   └── sample.mp3           # Sample audio for instant 1-click test
-├── .github/workflows/
-│   └── deploy-pages.yml     # Automated GitHub Pages CI/CD workflow
+├── templates/
+│   └── index.html           # FastAPI template mirror
 ├── main.py                  # Optional: FastAPI local backend server
 ├── cli.py                   # Optional: Python Command-Line Interface
 ├── transcriber.py           # Optional: Faster-Whisper local engine
