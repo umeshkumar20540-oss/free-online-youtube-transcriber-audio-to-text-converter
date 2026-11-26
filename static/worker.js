@@ -44,7 +44,7 @@ async function getTranscriber(modelSize, requestedDevice) {
         device: 'webgpu',
         dtype: {
           encoder_model: 'fp32',
-          decoder_model_merged: 'q4'
+          decoder_model_merged: 'q8'
         },
         progress_callback: (progressData) => {
           self.postMessage({ type: 'progress', data: progressData });
@@ -140,7 +140,9 @@ self.addEventListener('message', async (e) => {
         chunk_length_s: chunk_length_s,
         stride_length_s: stride_length_s,
         return_timestamps: true,
-        task: task || 'transcribe'
+        task: task || 'transcribe',
+        repetition_penalty: 1.2,
+        no_repeat_ngram_size: 3
       };
 
       if (language && language !== 'auto') {
@@ -151,15 +153,25 @@ self.addEventListener('message', async (e) => {
       const output = await pipelineInstance(audio, options);
       const executionTime = ((performance.now() - startTime) / 1000).toFixed(2);
 
-      // Normalize output chunks
+      // Normalize output chunks and ensure monotonic timestamps
       let chunks = [];
       if (Array.isArray(output.chunks) && output.chunks.length > 0) {
-        chunks = output.chunks.map((c, idx) => ({
-          id: idx,
-          start: Array.isArray(c.timestamp) ? c.timestamp[0] ?? 0 : (idx * 5),
-          end: Array.isArray(c.timestamp) ? c.timestamp[1] ?? ((c.timestamp[0] ?? 0) + 2) : ((idx + 1) * 5),
-          text: (c.text || '').trim()
-        })).filter(c => c.text.length > 0);
+        let lastEnd = 0;
+        chunks = output.chunks.map((c, idx) => {
+          let start = Array.isArray(c.timestamp) && c.timestamp[0] != null ? c.timestamp[0] : lastEnd;
+          let end = Array.isArray(c.timestamp) && c.timestamp[1] != null ? c.timestamp[1] : (start + 2);
+          if (start < lastEnd && start < 5 && lastEnd > 10) {
+            start = lastEnd;
+            end = Math.max(start + 1, end + lastEnd);
+          }
+          lastEnd = Math.max(lastEnd, end);
+          return {
+            id: idx,
+            start: start,
+            end: end,
+            text: (c.text || '').trim()
+          };
+        }).filter(c => c.text.length > 0);
       } else {
         chunks = [{
           id: 0,

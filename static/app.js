@@ -196,26 +196,29 @@ tabMic.addEventListener('click', () => switchTab('mic'));
 
 // 4. Audio Processing Helpers (Web Audio API)
 async function decodeAudioFile(fileOrBlob) {
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
   const arrayBuffer = await fileOrBlob.arrayBuffer();
-  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const decoded = await tempCtx.decodeAudioData(arrayBuffer);
+  await tempCtx.close().catch(() => {});
 
-  currentAudioDuration = audioBuffer.duration;
+  currentAudioDuration = decoded.duration;
   if (videoPreviewDurationVal) {
     videoPreviewDurationVal.textContent = formatTime(currentAudioDuration);
   }
 
-  // Convert to 16kHz mono Float32Array
+  // Guarantee exact 16kHz mono Float32Array via OfflineAudioContext
   let float32Array;
-  if (audioBuffer.numberOfChannels === 1) {
-    float32Array = audioBuffer.getChannelData(0);
+  if (decoded.sampleRate === 16000 && decoded.numberOfChannels === 1) {
+    float32Array = decoded.getChannelData(0);
   } else {
-    const ch0 = audioBuffer.getChannelData(0);
-    const ch1 = audioBuffer.getChannelData(1);
-    float32Array = new Float32Array(ch0.length);
-    for (let i = 0; i < ch0.length; i++) {
-      float32Array[i] = (ch0[i] + ch1[i]) / 2;
-    }
+    const targetLength = Math.max(1, Math.ceil(decoded.duration * 16000));
+    const offlineCtx = new OfflineAudioContext(1, targetLength, 16000);
+    const source = offlineCtx.createBufferSource();
+    source.buffer = decoded;
+    source.connect(offlineCtx.destination);
+    source.start(0);
+    const rendered = await offlineCtx.startRendering();
+    float32Array = rendered.getChannelData(0);
   }
 
   currentAudioFloat32 = float32Array;
