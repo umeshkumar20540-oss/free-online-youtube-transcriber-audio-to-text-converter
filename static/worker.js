@@ -44,7 +44,7 @@ async function getTranscriber(modelSize, requestedDevice) {
         device: 'webgpu',
         dtype: {
           encoder_model: 'fp32',
-          decoder_model_merged: 'q8'
+          decoder_model_merged: 'q4'
         },
         progress_callback: (progressData) => {
           self.postMessage({ type: 'progress', data: progressData });
@@ -136,13 +136,25 @@ self.addEventListener('message', async (e) => {
         message: `Transcribing audio using client ${activeDev === 'webgpu' ? 'GPU (WebGPU)' : 'CPU (WebAssembly)'}...`
       });
 
+      const totalChunks = Math.max(1, Math.ceil((audio.length / 16000) / chunk_length_s));
+      let completedChunks = 0;
+
       const options = {
         chunk_length_s: chunk_length_s,
         stride_length_s: stride_length_s,
         return_timestamps: true,
         task: task || 'transcribe',
-        repetition_penalty: 1.2,
-        no_repeat_ngram_size: 3
+        chunk_callback: (chunk) => {
+          completedChunks++;
+          const pct = Math.min(98, Math.round((completedChunks / totalChunks) * 100));
+          self.postMessage({
+            type: 'chunk_progress',
+            completed: completedChunks,
+            total: totalChunks,
+            pct: pct,
+            text: (chunk && chunk.text) ? chunk.text.trim() : ''
+          });
+        }
       };
 
       if (language && language !== 'auto') {

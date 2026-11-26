@@ -145,7 +145,7 @@ themeToggleBtn.addEventListener('click', () => {
 async function detectHardware() {
   if (navigator.gpu) {
     try {
-      const adapter = await navigator.gpu.requestAdapter();
+      const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
       if (adapter) {
         let desc = "Hardware GPU Acceleration";
         if (adapter.info && adapter.info.description) {
@@ -693,6 +693,14 @@ startTranscribeBtn.addEventListener('click', async () => {
         progressPctText.textContent = `${pct}%`;
         progressStatusText.textContent = `Loading Whisper AI Model (${p.file || 'weights'})...`;
         progressSubText.textContent = `AI Neural Network: ${(p.loaded / 1024 / 1024).toFixed(1)} MB / ${(p.total / 1024 / 1024).toFixed(1)} MB (GPU Memory)`;
+      }
+    } else if (msg.type === 'chunk_progress') {
+      progressBarFill.classList.remove('animate-pulse');
+      progressBarFill.style.width = `${msg.pct}%`;
+      progressPctText.textContent = `${msg.pct}%`;
+      progressStatusText.textContent = `Transcribing chunk ${msg.completed} of ${msg.total}...`;
+      if (msg.text) {
+        appendLiveStreamLine(`&gt; [${msg.completed}/${msg.total}] ${escapeHtml(msg.text)}`);
       }
     } else if (msg.type === 'status') {
       progressStatusText.textContent = msg.message;
