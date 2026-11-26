@@ -96,7 +96,18 @@ const historyListContainer = document.getElementById('historyListContainer');
 const historySearchInput = document.getElementById('historySearchInput');
 const historyCountBadge = document.getElementById('historyCountBadge');
 
-// 1. Theme Management
+// 1. Theme Management & Server Config
+const serverConfigBtn = document.getElementById('serverConfigBtn');
+if (serverConfigBtn) {
+  serverConfigBtn.addEventListener('click', () => {
+    const cur = localStorage.getItem('whisperflow_backend_url') || 'https://numerical-totally-dawn-editing.trycloudflare.com';
+    const next = prompt("Enter your Python / Colab Backend URL (HTTPS):\n(Leave default or update whenever Colab restarts)", cur);
+    if (next !== null && next.trim()) {
+      localStorage.setItem('whisperflow_backend_url', next.trim().replace(/\/$/, ''));
+      showToast('Backend URL updated to ' + next.trim(), 'success');
+    }
+  });
+}
 function initTheme() {
   const saved = localStorage.getItem('whisperflow_theme') || 'dark';
   if (saved === 'dark') {
@@ -279,40 +290,43 @@ async function handleYouTubeUrl() {
     }
 
     videoPreviewCard.classList.remove('hidden');
-    youtubeStatusBadge.innerHTML = `Fetching audio stream for in-browser transcription...`;
+    youtubeStatusBadge.innerHTML = `<span class="flex items-center space-x-1.5"><i data-lucide="loader-2" class="w-4 h-4 animate-spin text-brand-400"></i><span>Extracting YouTube audio stream via Colab Cloud Backend...</span></span>`;
+    lucide.createIcons();
 
-    // Try fetching audio via public CORS-friendly instances or fallback to demo/sample
+    // 1. First attempt: Dedicated Cloud Backend (Google Colab / Cloudflare Tunnel)
     let audioBlobLoaded = false;
-    const streamProxies = [
-      `https://api.piped.private.coffee/streams/${videoId}`,
-      `https://inv.nadeko.net/api/v1/videos/${videoId}`
-    ];
+    const backendUrl = localStorage.getItem('whisperflow_backend_url') || 'https://numerical-totally-dawn-editing.trycloudflare.com';
 
-    for (const proxyUrl of streamProxies) {
+    if (backendUrl) {
       try {
-        const proxyRes = await fetch(proxyUrl, { signal: AbortSignal.timeout(4000) });
-        if (proxyRes.ok) {
-          const streamData = await proxyRes.json();
-          const audioStreams = streamData.audioStreams || (streamData.adaptiveFormats && streamData.adaptiveFormats.filter(f => f.type && f.type.startsWith('audio')));
-          if (audioStreams && audioStreams.length > 0) {
-            const streamUrl = audioStreams[0].url;
-            const audioFetch = await fetch(streamUrl);
-            if (audioFetch.ok) {
-              const blob = await audioFetch.blob();
-              await decodeAudioFile(blob);
-              audioBlobLoaded = true;
-              break;
-            }
-          }
+        const cloudRes = await fetch(`${backendUrl}/api/audio`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: `https://www.youtube.com/watch?v=${videoId}` })
+        });
+
+        if (cloudRes.ok) {
+          const blob = await cloudRes.blob();
+          await decodeAudioFile(blob);
+          audioBlobLoaded = true;
         }
-      } catch (err) {
-        // Continue to next mirror
+      } catch (backendErr) {
+        console.warn("Colab Cloud backend unreachable or error:", backendErr);
       }
     }
 
     if (audioBlobLoaded) {
-      youtubeStatusBadge.innerHTML = `<span class="text-emerald-400 font-semibold">&check; Audio stream ready</span> (${formatTime(currentAudioDuration)})`;
-      showToast('YouTube audio stream loaded successfully!', 'success');
+      youtubeStatusBadge.innerHTML = `
+        <div class="mt-2 p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center justify-between">
+          <span class="flex items-center space-x-1.5">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>YouTube Audio Extracted (${formatTime(currentAudioDuration)})</span>
+          </span>
+          <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Colab Backend Connected</span>
+        </div>
+      `;
+      showToast('YouTube audio extracted! Ready to transcribe on your GPU & CPU.', 'success');
+      lucide.createIcons();
     } else {
       // Browser CORS restricts static web pages from downloading raw streams directly from googlevideo.com
       youtubeStatusBadge.innerHTML = `
