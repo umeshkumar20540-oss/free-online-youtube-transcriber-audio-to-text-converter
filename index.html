@@ -309,9 +309,10 @@
             Whisper Model
           </label>
           <select id="modelSelect" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-surface-850 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-            <option value="tiny" selected>Tiny (~40 MB, Ultra-Fast)</option>
-            <option value="base">Base (~75 MB, Recommended)</option>
-            <option value="small">Small (~240 MB, High Accuracy)</option>
+            <option value="small" selected>Small / Mid (~240 MB, All Languages - Recommended)</option>
+            <option value="large-v3-turbo">Large-v3 Turbo (~600 MB, Best Accuracy for Hindi &amp; All)</option>
+            <option value="base">Base (~75 MB, Balanced)</option>
+            <option value="tiny">Tiny (~40 MB, Ultra-Fast English)</option>
           </select>
         </div>
 
@@ -390,7 +391,7 @@
             Inference Hardware
           </label>
           <select id="deviceSelect" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-surface-850 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-            <option value="auto" selected>Auto (User GPU with CPU Fallback)</option>
+            <option value="auto" selected>Auto (GPU+CPU Hybrid, CPU Fallback)</option>
             <option value="webgpu">Force GPU (WebGPU)</option>
             <option value="wasm">Force CPU (WebAssembly Multi-thread)</option>
           </select>

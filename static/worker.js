@@ -11,14 +11,14 @@ let transcriber = null;
 let currentModelKey = null;
 let currentDeviceKey = null;
 
-// Map user model selection to ONNX Community Whisper models
+// Map user model selection to verified ONNX Community multilingual Whisper models
 const MODEL_MAPPING = {
   'tiny': 'onnx-community/whisper-tiny',
   'base': 'onnx-community/whisper-base',
   'small': 'onnx-community/whisper-small',
-  'medium': 'onnx-community/whisper-base', // fallback to base for in-browser memory safety
-  'large-v3-turbo': 'onnx-community/whisper-small',
-  'large-v3': 'onnx-community/whisper-small'
+  'medium': 'onnx-community/whisper-small', // onnx-community does not host public whisper-medium; small (~240MB) is the mid-tier multilingual model
+  'large-v3-turbo': 'onnx-community/whisper-large-v3-turbo',
+  'large-v3': 'onnx-community/whisper-large-v3-turbo'
 };
 
 async function getTranscriber(modelSize, requestedDevice) {
@@ -170,7 +170,24 @@ self.addEventListener('message', async (e) => {
       }
 
       const startTime = performance.now();
-      const output = await pipelineInstance(audio, options);
+      let output;
+      let usedDev = activeDev;
+      try {
+        output = await pipelineInstance(audio, options);
+      } catch (inferErr) {
+        if (activeDev === 'webgpu' && device !== 'webgpu') {
+          console.warn('WebGPU inference failed, falling back to CPU (WebAssembly):', inferErr);
+          self.postMessage({
+            type: 'status',
+            message: 'GPU memory limit reached. Switching to multi-threaded CPU (WebAssembly)...'
+          });
+          const cpuFallback = await getTranscriber(modelSize, 'wasm');
+          usedDev = cpuFallback.device;
+          output = await cpuFallback.transcriber(audio, options);
+        } else {
+          throw inferErr;
+        }
+      }
       const executionTime = ((performance.now() - startTime) / 1000).toFixed(2);
 
       // Normalize output chunks and ensure monotonic timestamps
@@ -206,7 +223,7 @@ self.addEventListener('message', async (e) => {
         result: {
           full_text: output.text ? output.text.trim() : chunks.map(c => c.text).join(' '),
           segments: chunks,
-          device_used: activeDev === 'webgpu' ? 'WebGPU (Client GPU)' : 'CPU (Client WebAssembly)',
+          device_used: usedDev === 'webgpu' ? 'WebGPU (GPU + CPU Hybrid)' : 'CPU (Client WebAssembly)',
           execution_time: executionTime
         }
       });
