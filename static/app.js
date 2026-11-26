@@ -352,6 +352,7 @@ async function handleYouTubeUrl() {
     // 1. First attempt: Dedicated Cloud Backend (Google Colab / Cloudflare Tunnel)
     let audioBlobLoaded = false;
     let finalAudioBlob = null;
+    let backendErrorMsg = '';
     const backendUrl = localStorage.getItem('whisperflow_backend_url') || 'https://numerical-totally-dawn-editing.trycloudflare.com';
 
     if (backendUrl) {
@@ -366,19 +367,31 @@ async function handleYouTubeUrl() {
           const contentLength = cloudRes.headers.get('Content-Length');
           const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
           const serverDuration = cloudRes.headers.get('X-Audio-Duration');
-          const serverTitle = cloudRes.headers.get('X-Audio-Title');
-          const serverUploader = cloudRes.headers.get('X-Audio-Uploader');
+          const rawTitle = cloudRes.headers.get('X-Audio-Title');
+          const rawUploader = cloudRes.headers.get('X-Audio-Uploader');
 
           if (serverDuration && !isNaN(serverDuration)) {
             videoPreviewDurationVal.textContent = formatTime(parseFloat(serverDuration));
           }
-          if (serverTitle && serverTitle.trim()) {
-            videoPreviewTitle.textContent = serverTitle.trim();
-            currentMediaTitle = serverTitle.trim();
+          if (rawTitle && rawTitle.trim()) {
+            try {
+              const decodedTitle = decodeURIComponent(rawTitle.trim());
+              videoPreviewTitle.textContent = decodedTitle;
+              currentMediaTitle = decodedTitle;
+            } catch (e) {
+              videoPreviewTitle.textContent = rawTitle.trim();
+              currentMediaTitle = rawTitle.trim();
+            }
           }
-          if (serverUploader && serverUploader.trim()) {
-            videoPreviewChannelVal.textContent = serverUploader.trim();
-            currentMediaAuthor = serverUploader.trim();
+          if (rawUploader && rawUploader.trim()) {
+            try {
+              const decodedUploader = decodeURIComponent(rawUploader.trim());
+              videoPreviewChannelVal.textContent = decodedUploader;
+              currentMediaAuthor = decodedUploader;
+            } catch (e) {
+              videoPreviewChannelVal.textContent = rawUploader.trim();
+              currentMediaAuthor = rawUploader.trim();
+            }
           }
 
           const phaseText = document.getElementById('ytStatusPhaseText');
@@ -432,9 +445,17 @@ async function handleYouTubeUrl() {
 
           await decodeAudioFile(finalAudioBlob);
           audioBlobLoaded = true;
+        } else {
+          try {
+            const errJson = await cloudRes.json();
+            backendErrorMsg = errJson.detail || `Server error (${cloudRes.status})`;
+          } catch (e) {
+            backendErrorMsg = `Server returned HTTP ${cloudRes.status}`;
+          }
         }
       } catch (backendErr) {
         console.warn("Colab Cloud backend unreachable or error:", backendErr);
+        backendErrorMsg = backendErr.message || "Backend unreachable";
       }
     }
 
@@ -462,12 +483,15 @@ async function handleYouTubeUrl() {
       }, 600);
 
     } else {
-      // Browser CORS restricts static web pages from downloading raw streams directly from googlevideo.com
+      const displayErr = backendErrorMsg && backendErrorMsg.includes('Sign in to confirm')
+        ? 'YouTube blocked the Colab cloud IP ("Sign in to confirm you\'re not a bot"). Run the backend on your own PC or upload cookies.txt to Colab, or use 1-click download below:'
+        : (backendErrorMsg ? `Backend error: ${escapeHtml(backendErrorMsg.slice(0, 140))}` : 'Browser CORS Restriction: YouTube blocks direct client streaming without a connected backend.');
+
       youtubeStatusBadge.innerHTML = `
         <div class="mt-3 p-3.5 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-3">
           <div class="flex items-center space-x-2 text-amber-400 text-xs font-semibold">
             <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
-            <span>Browser CORS Restriction: YouTube blocks direct client streaming without a connected backend.</span>
+            <span>${displayErr}</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
             <a href="https://yt5s.biz/en/youtube-to-mp3?q=https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener noreferrer" 
