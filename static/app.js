@@ -682,6 +682,17 @@ startTranscribeBtn.addEventListener('click', async () => {
   // Progress simulation / tracking
   let lastProgressPct = 5;
 
+  // Live elapsed timer during transcription
+  const transcribeStartMs = Date.now();
+  const transcribeTimerInterval = setInterval(() => {
+    const sec = Math.floor((Date.now() - transcribeStartMs) / 1000);
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = (sec % 60).toString().padStart(2, '0');
+    if (progressStatusText.textContent.includes('Transcribing')) {
+      progressPctText.textContent = `${m}:${s}`;
+    }
+  }, 1000);
+
   worker.onmessage = (e) => {
     const msg = e.data;
 
@@ -693,6 +704,12 @@ startTranscribeBtn.addEventListener('click', async () => {
         progressPctText.textContent = `${pct}%`;
         progressStatusText.textContent = `Loading Whisper AI Model (${p.file || 'weights'})...`;
         progressSubText.textContent = `AI Neural Network: ${(p.loaded / 1024 / 1024).toFixed(1)} MB / ${(p.total / 1024 / 1024).toFixed(1)} MB (GPU Memory)`;
+      }
+    } else if (msg.type === 'stream_text') {
+      progressBarFill.classList.add('animate-pulse');
+      progressBarFill.style.width = '90%';
+      if (msg.text) {
+        appendLiveStreamLine(`&gt; ${escapeHtml(msg.text)}`);
       }
     } else if (msg.type === 'chunk_progress') {
       progressBarFill.classList.remove('animate-pulse');
@@ -717,6 +734,7 @@ startTranscribeBtn.addEventListener('click', async () => {
         appendLiveStreamLine('&gt; WebAssembly CPU Pipeline Ready. Multi-threaded WASM active.');
       }
     } else if (msg.type === 'complete') {
+      clearInterval(transcribeTimerInterval);
       progressBarFill.classList.remove('animate-pulse');
       progressBarFill.style.width = '100%';
       progressPctText.textContent = '100%';
@@ -751,6 +769,7 @@ startTranscribeBtn.addEventListener('click', async () => {
       }, 500);
 
     } else if (msg.type === 'error') {
+      clearInterval(transcribeTimerInterval);
       progressCard.classList.add('hidden');
       startTranscribeBtn.disabled = false;
       showToast('Transcription error: ' + msg.error, 'error');

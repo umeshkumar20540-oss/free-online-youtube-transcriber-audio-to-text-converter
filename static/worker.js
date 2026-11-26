@@ -1,7 +1,7 @@
 // WhisperFlow In-Browser Web Worker for Client-Side GPU (WebGPU) and CPU (WASM) Transcription
 // Powered by Hugging Face Transformers.js (ONNX Runtime Web)
 
-import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3';
+import { pipeline, env, WhisperTextStreamer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3';
 
 // Configure Transformers.js runtime
 env.allowLocalModels = false;
@@ -136,26 +136,34 @@ self.addEventListener('message', async (e) => {
         message: `Transcribing audio using client ${activeDev === 'webgpu' ? 'GPU (WebGPU)' : 'CPU (WebAssembly)'}...`
       });
 
-      const totalChunks = Math.max(1, Math.ceil((audio.length / 16000) / chunk_length_s));
-      let completedChunks = 0;
-
       const options = {
         chunk_length_s: chunk_length_s,
         stride_length_s: stride_length_s,
         return_timestamps: true,
-        task: task || 'transcribe',
-        chunk_callback: (chunk) => {
-          completedChunks++;
-          const pct = Math.min(98, Math.round((completedChunks / totalChunks) * 100));
-          self.postMessage({
-            type: 'chunk_progress',
-            completed: completedChunks,
-            total: totalChunks,
-            pct: pct,
-            text: (chunk && chunk.text) ? chunk.text.trim() : ''
+        task: task || 'transcribe'
+      };
+
+      // Stream live recognized text as it is generated
+      try {
+        if (typeof WhisperTextStreamer !== 'undefined' && pipelineInstance.tokenizer) {
+          let chunkIdx = 0;
+          options.streamer = new WhisperTextStreamer(pipelineInstance.tokenizer, {
+            time_precision: 0.02,
+            callback_function: (text) => {
+              if (text && text.trim()) {
+                chunkIdx++;
+                self.postMessage({
+                  type: 'stream_text',
+                  chunk: chunkIdx,
+                  text: text.trim()
+                });
+              }
+            }
           });
         }
-      };
+      } catch (streamErr) {
+        console.warn('Streamer init skipped:', streamErr);
+      }
 
       if (language && language !== 'auto') {
         options.language = language;
