@@ -1,0 +1,56 @@
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+/* Synced segment card styles */
+.segment-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.segment-card:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateX(2px);
+}
+
+.segment-card.active-segment {
+  border-color: rgba(99, 102, 241, 0.8) !important;
+  background-color: rgba(99, 102, 241, 0.08) !important;
+  box-shadow: 0 4px 14px -2px rgba(99, 102, 241, 0.15);
+}
+
+/* Search match highlights */
+mark.search-highlight {
+  background-color: rgba(245, 158, 11, 0.35);
+  color: inherit;
+  font-weight: 600;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Playback speed buttons */
+.speed-btn.active {
+  background-color: #6366f1 !important;
+  color: #ffffff !important;
+}
+
+/* Dropzone dragging */
+.dropzone-active {
+  border-color: #6366f1 !important;
+  background-color: rgba(99, 102, 241, 0.05) !important;
+}
