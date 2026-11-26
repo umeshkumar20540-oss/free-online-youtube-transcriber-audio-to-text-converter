@@ -314,17 +314,45 @@ async function handleYouTubeUrl() {
       youtubeStatusBadge.innerHTML = `<span class="text-emerald-400 font-semibold">&check; Audio stream ready</span> (${formatTime(currentAudioDuration)})`;
       showToast('YouTube audio stream loaded successfully!', 'success');
     } else {
-      // YouTube direct CORS restrictions: provide clear instant options
+      // Browser CORS restricts static web pages from downloading raw streams directly from googlevideo.com
       youtubeStatusBadge.innerHTML = `
-        <div class="mt-2 p-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs space-y-1">
-          <p><strong>Direct CORS Notice:</strong> YouTube restricts third-party browser streams without a local backend.</p>
-          <div class="flex flex-wrap gap-2 pt-1">
-            <button onclick="loadSampleDemoAudio()" class="px-2.5 py-1 rounded bg-brand-600 hover:bg-brand-500 text-white font-semibold transition">&check; Test with Sample Audio</button>
-            <a href="https://cobalt.tools" target="_blank" class="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white transition">Get Audio via Cobalt &rarr;</a>
+        <div class="mt-3 p-3.5 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-3">
+          <div class="flex items-center space-x-2 text-amber-400 text-xs font-semibold">
+            <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
+            <span>Browser CORS Restriction: YouTube blocks static web pages from directly extracting video streams.</span>
           </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            <a href="https://yt5s.biz/en/youtube-to-mp3?q=https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener noreferrer" 
+               class="px-3.5 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow transition">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>1. Download Audio (Free MP3) ↗</span>
+            </a>
+            <label class="px-3.5 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center space-x-1.5 cursor-pointer shadow transition">
+              <i data-lucide="upload" class="w-4 h-4"></i>
+              <span>2. Drop or Select the MP3 File</span>
+              <input type="file" id="ytAudioFileInput" class="hidden" accept="audio/*,video/*,.mp3,.wav,.m4a">
+            </label>
+          </div>
+          <p class="text-[11px] text-slate-400">
+            💡 Once loaded, your device's <strong>GPU (WebGPU)</strong> or <strong>CPU</strong> transcribes the speech with 100% privacy! Or run <code>python main.py</code> locally for automatic <code>yt-dlp</code> downloads.
+          </p>
         </div>
       `;
       lucide.createIcons();
+
+      // Setup drop & select listener on the preview card
+      const ytFileInput = document.getElementById('ytAudioFileInput');
+      if (ytFileInput) {
+        ytFileInput.addEventListener('change', async (e) => {
+          if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            await decodeAudioFile(file);
+            youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Click "Start Transcription" below!</div>`;
+            showToast('Audio file loaded! Click "Start Transcription".', 'success');
+            lucide.createIcons();
+          }
+        });
+      }
     }
   } catch (err) {
     showToast(err.message, 'error');
@@ -338,6 +366,31 @@ async function handleYouTubeUrl() {
 fetchInfoBtn.addEventListener('click', handleYouTubeUrl);
 youtubeUrlInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') handleYouTubeUrl();
+});
+
+// Allow drag and drop of audio files directly onto the YouTube preview card
+['dragenter', 'dragover'].forEach(name => {
+  videoPreviewCard.addEventListener(name, (e) => {
+    e.preventDefault();
+    videoPreviewCard.classList.add('border-brand-500');
+  });
+});
+
+['dragleave', 'drop'].forEach(name => {
+  videoPreviewCard.addEventListener(name, (e) => {
+    e.preventDefault();
+    videoPreviewCard.classList.remove('border-brand-500');
+  });
+});
+
+videoPreviewCard.addEventListener('drop', async (e) => {
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    const file = e.dataTransfer.files[0];
+    await decodeAudioFile(file);
+    youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Click "Start Transcription" below!</div>`;
+    showToast('Audio file loaded! Click "Start Transcription".', 'success');
+    lucide.createIcons();
+  }
 });
 
 // 7. Microphone Recording
