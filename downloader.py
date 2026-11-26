@@ -132,17 +132,12 @@ def download_youtube_audio(
             progress_callback(percent, speed_str, eta_str)
 
     ydl_opts = {
-        "format": "bestaudio/best",
+        "format": "ba[abr<=64][ext=m4a]/139/ba[ext=m4a]/140/ba/b",
         "outtmpl": str(output_dir / f"%(id)s.%(ext)s"),
         "noplaylist": True,
+        "concurrent_fragment_downloads": 8,
+        "resize_buffer": True,
         "socket_timeout": 30,
-        "postprocessors": [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }
-        ],
         "ffmpeg_location": ffmpeg_exe,
         "progress_hooks": [ytdl_hook],
         "quiet": True,
