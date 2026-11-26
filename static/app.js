@@ -96,11 +96,14 @@ const historyListContainer = document.getElementById('historyListContainer');
 const historySearchInput = document.getElementById('historySearchInput');
 const historyCountBadge = document.getElementById('historyCountBadge');
 
+const isLocalPC = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
+const DEFAULT_BACKEND_URL = isLocalPC ? window.location.origin : 'https://youtube.minimaxtools.com';
+
 // 1. Theme Management & Server Config
 const serverConfigBtn = document.getElementById('serverConfigBtn');
 if (serverConfigBtn) {
   serverConfigBtn.addEventListener('click', () => {
-    const cur = localStorage.getItem('whisperflow_backend_url') || 'https://youtube.minimaxtools.com';
+    const cur = localStorage.getItem('whisperflow_backend_url') || DEFAULT_BACKEND_URL;
     const next = prompt("Enter your Python / Colab Backend URL (HTTPS):\n(Leave default or update whenever Colab restarts)", cur);
     if (next !== null && next.trim()) {
       localStorage.setItem('whisperflow_backend_url', next.trim().replace(/\/$/, ''));
@@ -371,7 +374,7 @@ async function handleYouTubeUrl() {
     let audioBlobLoaded = false;
     let finalAudioBlob = null;
     let backendErrorMsg = '';
-    const backendUrl = localStorage.getItem('whisperflow_backend_url') || 'https://youtube.minimaxtools.com';
+    const backendUrl = isLocalPC ? window.location.origin : (localStorage.getItem('whisperflow_backend_url') || DEFAULT_BACKEND_URL);
 
     if (backendUrl) {
       try {

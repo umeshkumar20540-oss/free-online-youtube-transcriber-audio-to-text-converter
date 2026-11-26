@@ -162,6 +162,33 @@ async def fetch_url_info(req: UrlInfoRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/audio")
+async def download_audio_for_browser(req: UrlInfoRequest):
+    """Downloads compact AAC audio locally on the user's PC and streams it to the browser UI."""
+    if not req.url or not is_valid_youtube_url(req.url):
+        raise HTTPException(status_code=400, detail="Invalid YouTube URL.")
+    try:
+        from urllib.parse import quote
+        info = download_youtube_audio(req.url)
+        audio_path = Path(info["audio_path"])
+        ext = audio_path.suffix.lower()
+        media_type = "audio/mp4" if ext in [".m4a", ".mp4", ".aac"] else "audio/mpeg"
+        return FileResponse(
+            path=str(audio_path),
+            media_type=media_type,
+            filename=audio_path.name,
+            headers={
+                "X-Audio-Duration": str(info.get("duration", 0)),
+                "X-Audio-Title": quote(str(info.get("title", "audio"))[:100]),
+                "X-Audio-Uploader": quote(str(info.get("uploader", ""))[:100]),
+                "Access-Control-Expose-Headers": "X-Audio-Duration, X-Audio-Title, X-Audio-Uploader, Content-Length",
+            },
+        )
+    except Exception as e:
+        logger.error(f"Error extracting local audio: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/upload")
 async def upload_audio_file(file: UploadFile = File(...)):
     """Uploads a local audio or video file for transcription."""
