@@ -182,6 +182,9 @@ async function decodeAudioFile(fileOrBlob) {
   const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
   currentAudioDuration = audioBuffer.duration;
+  if (videoPreviewDurationVal) {
+    videoPreviewDurationVal.textContent = formatTime(currentAudioDuration);
+  }
 
   // Convert to 16kHz mono Float32Array
   let float32Array;
@@ -268,6 +271,9 @@ async function handleYouTubeUrl() {
   fetchInfoBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Loading...</span>`;
   lucide.createIcons();
 
+  let ytTimerInterval = null;
+  const startTimerMs = Date.now();
+
   try {
     currentMediaThumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
     videoPreviewThumbnail.src = currentMediaThumbnail;
@@ -290,11 +296,43 @@ async function handleYouTubeUrl() {
     }
 
     videoPreviewCard.classList.remove('hidden');
-    youtubeStatusBadge.innerHTML = `<span class="flex items-center space-x-1.5"><i data-lucide="loader-2" class="w-4 h-4 animate-spin text-brand-400"></i><span>Extracting YouTube audio stream via Colab Cloud Backend...</span></span>`;
+
+    // Rich Live Progress UI with live elapsed timer, MB counter, and percentage
+    youtubeStatusBadge.innerHTML = `
+      <div class="mt-3 p-3.5 rounded-xl bg-slate-900/95 border border-slate-700/80 space-y-2.5">
+        <div class="flex items-center justify-between text-xs">
+          <span class="flex items-center space-x-2 text-brand-300 font-semibold" id="ytStatusPhaseText">
+            <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-brand-400"></i>
+            <span>1. Connecting to Cloud Server &amp; Extracting Lightweight AAC Audio...</span>
+          </span>
+          <span id="ytTimerDisplay" class="text-slate-400 font-mono text-[11px]">Elapsed: 00:00</span>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+          <div id="ytProgressBar" class="bg-gradient-to-r from-brand-500 to-emerald-400 h-2 rounded-full transition-all duration-150 animate-pulse" style="width: 15%"></div>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-slate-400">
+          <span id="ytStatusDetailText">Downloading AAC/M4A audio only (Ultra-lightweight ~15-20MB)...</span>
+          <span id="ytStatusSpeedText" class="font-mono text-emerald-400 text-[10px]">Fast Stream</span>
+        </div>
+      </div>
+    `;
     lucide.createIcons();
+
+    // Start live elapsed timer
+    ytTimerInterval = setInterval(() => {
+      const elapsedSec = Math.floor((Date.now() - startTimerMs) / 1000);
+      const timerEl = document.getElementById('ytTimerDisplay');
+      if (timerEl) {
+        const m = Math.floor(elapsedSec / 60).toString().padStart(2, '0');
+        const s = (elapsedSec % 60).toString().padStart(2, '0');
+        timerEl.textContent = `Elapsed: ${m}:${s}`;
+      }
+    }, 1000);
 
     // 1. First attempt: Dedicated Cloud Backend (Google Colab / Cloudflare Tunnel)
     let audioBlobLoaded = false;
+    let finalAudioBlob = null;
     const backendUrl = localStorage.getItem('whisperflow_backend_url') || 'https://numerical-totally-dawn-editing.trycloudflare.com';
 
     if (backendUrl) {
@@ -306,8 +344,74 @@ async function handleYouTubeUrl() {
         });
 
         if (cloudRes.ok) {
-          const blob = await cloudRes.blob();
-          await decodeAudioFile(blob);
+          const contentLength = cloudRes.headers.get('Content-Length');
+          const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
+          const serverDuration = cloudRes.headers.get('X-Audio-Duration');
+          const serverTitle = cloudRes.headers.get('X-Audio-Title');
+          const serverUploader = cloudRes.headers.get('X-Audio-Uploader');
+
+          if (serverDuration && !isNaN(serverDuration)) {
+            videoPreviewDurationVal.textContent = formatTime(parseFloat(serverDuration));
+          }
+          if (serverTitle && serverTitle.trim()) {
+            videoPreviewTitle.textContent = serverTitle.trim();
+            currentMediaTitle = serverTitle.trim();
+          }
+          if (serverUploader && serverUploader.trim()) {
+            videoPreviewChannelVal.textContent = serverUploader.trim();
+            currentMediaAuthor = serverUploader.trim();
+          }
+
+          const phaseText = document.getElementById('ytStatusPhaseText');
+          const detailText = document.getElementById('ytStatusDetailText');
+          const speedText = document.getElementById('ytStatusSpeedText');
+          const bar = document.getElementById('ytProgressBar');
+
+          if (bar) bar.classList.remove('animate-pulse');
+          if (phaseText) {
+            phaseText.innerHTML = `<i data-lucide="download-cloud" class="w-4 h-4 text-emerald-400"></i><span>2. Streaming Lightweight AAC Audio to Browser...</span>`;
+            lucide.createIcons();
+          }
+
+          // Use ReadableStream for real-time bytes & percentage progress
+          const reader = cloudRes.body.getReader();
+          const chunks = [];
+          let receivedBytes = 0;
+          const streamStart = Date.now();
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            receivedBytes += value.length;
+
+            const streamSec = (Date.now() - streamStart) / 1000;
+            const mbRecv = (receivedBytes / 1048576).toFixed(1);
+            const speed = streamSec > 0.2 ? ((receivedBytes / 1048576) / streamSec).toFixed(1) : '1.5';
+
+            if (totalBytes > 0 && bar) {
+              const pct = Math.min(100, Math.round((receivedBytes / totalBytes) * 100));
+              bar.style.width = `${pct}%`;
+              if (detailText) detailText.textContent = `Streaming AAC: ${mbRecv} MB / ${(totalBytes / 1048576).toFixed(1)} MB (${pct}%)`;
+            } else {
+              if (bar) bar.style.width = '70%';
+              if (detailText) detailText.textContent = `Streaming AAC: ${mbRecv} MB received`;
+            }
+            if (speedText) speedText.textContent = `${speed} MB/s`;
+          }
+
+          const contentType = cloudRes.headers.get('Content-Type') || 'audio/mp4';
+          finalAudioBlob = new Blob(chunks, { type: contentType });
+
+          // Phase 3: Decoding into WebGPU audio buffer
+          if (phaseText) {
+            phaseText.innerHTML = `<i data-lucide="cpu" class="w-4 h-4 text-brand-400 animate-spin"></i><span>3. Decoding AAC Audio into WebGPU Audio Buffer...</span>`;
+            lucide.createIcons();
+          }
+          if (detailText) detailText.textContent = `Preparing 16kHz mono audio tensor for in-browser AI...`;
+          if (bar) bar.style.width = '95%';
+
+          await decodeAudioFile(finalAudioBlob);
           audioBlobLoaded = true;
         }
       } catch (backendErr) {
@@ -315,40 +419,51 @@ async function handleYouTubeUrl() {
       }
     }
 
-    if (audioBlobLoaded) {
+    if (ytTimerInterval) clearInterval(ytTimerInterval);
+
+    if (audioBlobLoaded && finalAudioBlob) {
+      const mbSize = (finalAudioBlob.size / 1048576).toFixed(1);
+      videoPreviewDurationVal.textContent = formatTime(currentAudioDuration);
+
       youtubeStatusBadge.innerHTML = `
-        <div class="mt-2 p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center justify-between">
-          <span class="flex items-center space-x-1.5">
-            <i data-lucide="check-circle" class="w-4 h-4"></i>
-            <span>YouTube Audio Extracted (${formatTime(currentAudioDuration)})</span>
+        <div class="mt-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center justify-between">
+          <span class="flex items-center space-x-2">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+            <span>✓ Audio Ready: ${formatTime(currentAudioDuration)} (${mbSize} MB AAC) &bull; Auto-Starting Transcription...</span>
           </span>
-          <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Colab Backend Connected</span>
+          <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">GPU Ready</span>
         </div>
       `;
-      showToast('YouTube audio extracted! Ready to transcribe on your GPU & CPU.', 'success');
       lucide.createIcons();
+      showToast(`AAC Audio loaded (${formatTime(currentAudioDuration)})! Starting transcription on your device...`, 'success');
+
+      // Auto-start transcription directly!
+      setTimeout(() => {
+        startTranscribeBtn.click();
+      }, 600);
+
     } else {
       // Browser CORS restricts static web pages from downloading raw streams directly from googlevideo.com
       youtubeStatusBadge.innerHTML = `
         <div class="mt-3 p-3.5 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-3">
           <div class="flex items-center space-x-2 text-amber-400 text-xs font-semibold">
             <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
-            <span>Browser CORS Restriction: YouTube blocks static web pages from directly extracting video streams.</span>
+            <span>Browser CORS Restriction: YouTube blocks direct client streaming without a connected backend.</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
             <a href="https://yt5s.biz/en/youtube-to-mp3?q=https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener noreferrer" 
                class="px-3.5 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow transition">
               <i data-lucide="download" class="w-4 h-4"></i>
-              <span>1. Download Audio (Free MP3) ↗</span>
+              <span>1. Download Audio (Fast AAC/MP3) ↗</span>
             </a>
             <label class="px-3.5 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center space-x-1.5 cursor-pointer shadow transition">
               <i data-lucide="upload" class="w-4 h-4"></i>
-              <span>2. Drop or Select the MP3 File</span>
-              <input type="file" id="ytAudioFileInput" class="hidden" accept="audio/*,video/*,.mp3,.wav,.m4a">
+              <span>2. Drop Audio File (Auto-Transcribes)</span>
+              <input type="file" id="ytAudioFileInput" class="hidden" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac">
             </label>
           </div>
           <p class="text-[11px] text-slate-400">
-            💡 Once loaded, your device's <strong>GPU (WebGPU)</strong> or <strong>CPU</strong> transcribes the speech with 100% privacy! Or run <code>python main.py</code> locally for automatic <code>yt-dlp</code> downloads.
+            💡 Once loaded, your device's <strong>GPU (WebGPU)</strong> or <strong>CPU</strong> transcribes the speech with 100% privacy!
           </p>
         </div>
       `;
@@ -361,14 +476,17 @@ async function handleYouTubeUrl() {
           if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             await decodeAudioFile(file);
-            youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Click "Start Transcription" below!</div>`;
-            showToast('Audio file loaded! Click "Start Transcription".', 'success');
+            videoPreviewDurationVal.textContent = formatTime(currentAudioDuration);
+            youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Starting transcription...</div>`;
             lucide.createIcons();
+            showToast('Audio loaded! Starting transcription...', 'success');
+            setTimeout(() => { startTranscribeBtn.click(); }, 600);
           }
         });
       }
     }
   } catch (err) {
+    if (ytTimerInterval) clearInterval(ytTimerInterval);
     showToast(err.message, 'error');
   } finally {
     fetchInfoBtn.disabled = false;
@@ -401,9 +519,11 @@ videoPreviewCard.addEventListener('drop', async (e) => {
   if (e.dataTransfer.files && e.dataTransfer.files[0]) {
     const file = e.dataTransfer.files[0];
     await decodeAudioFile(file);
-    youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Click "Start Transcription" below!</div>`;
-    showToast('Audio file loaded! Click "Start Transcription".', 'success');
+    videoPreviewDurationVal.textContent = formatTime(currentAudioDuration);
+    youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Starting transcription...</div>`;
+    showToast('Audio loaded! Starting transcription...', 'success');
     lucide.createIcons();
+    setTimeout(() => { startTranscribeBtn.click(); }, 600);
   }
 });
 
@@ -1008,8 +1128,12 @@ historySearchInput.addEventListener('input', () => {
 // 17. Utilities & Time Formatters
 function formatTime(seconds) {
   if (isNaN(seconds) || seconds < 0) return "00:00";
-  const mins = Math.floor(seconds / 60);
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
   const secs = Math.floor(seconds % 60);
+  if (hrs > 0) {
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
