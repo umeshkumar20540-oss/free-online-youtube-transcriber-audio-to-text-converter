@@ -223,8 +223,23 @@ async function decodeAudioFile(fileOrBlob) {
 
   currentAudioFloat32 = float32Array;
   currentAudioBlob = fileOrBlob;
-  audioPlayer.src = URL.createObjectURL(fileOrBlob);
+  const blobUrl = URL.createObjectURL(fileOrBlob);
+  audioPlayer.src = blobUrl;
   audioPlayer.load();
+
+  // Show pre-transcription audio preview player so user can listen before transcribing
+  const previewAudioBox = document.getElementById('previewAudioBox');
+  const previewAudioPlayer = document.getElementById('previewAudioPlayer');
+  const previewAudioMeta = document.getElementById('previewAudioMeta');
+  if (previewAudioPlayer && previewAudioBox) {
+    previewAudioPlayer.src = blobUrl;
+    previewAudioPlayer.load();
+    if (previewAudioMeta) {
+      const mb = (fileOrBlob.size / 1048576).toFixed(1);
+      previewAudioMeta.textContent = `${formatTime(currentAudioDuration)} • ${mb} MB`;
+    }
+    previewAudioBox.classList.remove('hidden');
+  }
 
   return float32Array;
 }
@@ -472,18 +487,13 @@ async function handleYouTubeUrl() {
         <div class="mt-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center justify-between">
           <span class="flex items-center space-x-2">
             <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-            <span>✓ Audio Ready: ${formatTime(currentAudioDuration)} (${mbSize} MB AAC) &bull; Auto-Starting Transcription...</span>
+            <span>✓ Audio Ready: ${formatTime(currentAudioDuration)} (${mbSize} MB AAC) &bull; Listen below, select Language &amp; click "Start Transcription"</span>
           </span>
-          <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">GPU Ready</span>
+          <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Ready</span>
         </div>
       `;
       lucide.createIcons();
-      showToast(`AAC Audio loaded (${formatTime(currentAudioDuration)})! Starting transcription on your device...`, 'success');
-
-      // Auto-start transcription directly!
-      setTimeout(() => {
-        startTranscribeBtn.click();
-      }, 600);
+      showToast(`Audio ready (${formatTime(currentAudioDuration)})! Listen, choose Language, and click "Start Transcription".`, 'success');
 
     } else {
       const displayErr = backendErrorMsg && backendErrorMsg.includes('Sign in to confirm')
@@ -523,10 +533,9 @@ async function handleYouTubeUrl() {
             const file = e.target.files[0];
             await decodeAudioFile(file);
             videoPreviewDurationVal.textContent = formatTime(currentAudioDuration);
-            youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Starting transcription...</div>`;
+            youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Listen below, choose Language, and click "Start Transcription"!</div>`;
             lucide.createIcons();
-            showToast('Audio loaded! Starting transcription...', 'success');
-            setTimeout(() => { startTranscribeBtn.click(); }, 600);
+            showToast('Audio loaded! Listen, select Language, and click "Start Transcription".', 'success');
           }
         });
       }
@@ -566,10 +575,9 @@ videoPreviewCard.addEventListener('drop', async (e) => {
     const file = e.dataTransfer.files[0];
     await decodeAudioFile(file);
     videoPreviewDurationVal.textContent = formatTime(currentAudioDuration);
-    youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Starting transcription...</div>`;
-    showToast('Audio loaded! Starting transcription...', 'success');
+    youtubeStatusBadge.innerHTML = `<div class="mt-2 text-xs text-emerald-400 font-semibold flex items-center space-x-1.5"><i data-lucide="check-circle" class="w-4 h-4"></i><span>Audio loaded: ${escapeHtml(file.name)} (${formatTime(currentAudioDuration)})</span> &bull; Listen below, choose Language, and click "Start Transcription"!</div>`;
+    showToast('Audio loaded! Listen, select Language, and click "Start Transcription".', 'success');
     lucide.createIcons();
-    setTimeout(() => { startTranscribeBtn.click(); }, 600);
   }
 });
 
@@ -1139,13 +1147,15 @@ function getHistoryList() {
 
 function updateHistoryBadge() {
   const list = getHistoryList();
-  historyCountBadge.textContent = list.length;
+  if (historyCountBadge) historyCountBadge.textContent = list.length;
 }
 
-openHistoryBtn.addEventListener('click', () => {
-  historyDrawerBackdrop.classList.remove('hidden');
-  renderHistoryDrawer();
-});
+if (openHistoryBtn) {
+  openHistoryBtn.addEventListener('click', () => {
+    historyDrawerBackdrop.classList.remove('hidden');
+    renderHistoryDrawer();
+  });
+}
 
 closeHistoryBtn.addEventListener('click', () => {
   historyDrawerBackdrop.classList.add('hidden');

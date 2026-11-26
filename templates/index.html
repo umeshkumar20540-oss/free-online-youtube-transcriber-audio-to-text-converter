@@ -143,13 +143,6 @@
           <span id="hardwareText" class="text-slate-600 dark:text-slate-300 font-mono">Detecting hardware...</span>
         </div>
 
-        <!-- History Drawer Button -->
-        <button id="openHistoryBtn" class="flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-surface-800 dark:hover:bg-surface-700 border border-slate-200 dark:border-slate-700/60 text-sm font-medium transition">
-          <i data-lucide="history" class="w-4 h-4 text-slate-500 dark:text-slate-400"></i>
-          <span>History</span>
-          <span id="historyCountBadge" class="px-1.5 py-0.2 text-xs rounded-full bg-brand-500/20 text-brand-400 font-bold">0</span>
-        </button>
-
         <!-- GitHub Repo Link -->
         <a href="https://github.com/umeshkumar20540-oss/youtube-transcriber" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-surface-800 dark:hover:bg-surface-700 border border-slate-200 dark:border-slate-700/60 transition" title="View Source on GitHub">
           <i data-lucide="github" class="w-4 h-4 text-slate-700 dark:text-slate-300"></i>
@@ -296,6 +289,18 @@
         </div>
       </div>
 
+      <!-- Pre-Transcription Audio Preview Player -->
+      <div id="previewAudioBox" class="hidden mt-5 p-3.5 rounded-xl bg-slate-50 dark:bg-surface-850 border border-emerald-500/30 space-y-2">
+        <div class="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-200">
+          <span class="flex items-center space-x-2">
+            <i data-lucide="volume-2" class="w-4 h-4 text-emerald-400"></i>
+            <span>Listen &amp; Verify Audio Before Transcribing</span>
+          </span>
+          <span id="previewAudioMeta" class="text-[11px] font-mono text-emerald-400">Ready</span>
+        </div>
+        <audio id="previewAudioPlayer" controls class="w-full h-10"></audio>
+      </div>
+
       <!-- Configuration Options -->
       <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Model Size Selector -->
@@ -318,18 +323,53 @@
           <select id="languageSelect" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-surface-850 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
             <option value="auto">Auto Detect Language</option>
             <option value="en">English</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="it">Italian</option>
-            <option value="pt">Portuguese</option>
-            <option value="nl">Dutch</option>
-            <option value="hi">Hindi</option>
-            <option value="ja">Japanese</option>
-            <option value="zh">Chinese</option>
-            <option value="ko">Korean</option>
-            <option value="ru">Russian</option>
-            <option value="ar">Arabic</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="ur">Urdu (اردو)</option>
+            <option value="bn">Bengali (বাংলা)</option>
+            <option value="ta">Tamil (தமிழ்)</option>
+            <option value="te">Telugu (తెలుగు)</option>
+            <option value="mr">Marathi (मराठी)</option>
+            <option value="gu">Gujarati (ગુજરાતી)</option>
+            <option value="kn">Kannada (ಕನ್ನಡ)</option>
+            <option value="ml">Malayalam (മലയാളം)</option>
+            <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+            <option value="ne">Nepali (नेपाली)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="de">German (Deutsch)</option>
+            <option value="it">Italian (Italiano)</option>
+            <option value="pt">Portuguese (Português)</option>
+            <option value="ru">Russian (Русский)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="ko">Korean (한국어)</option>
+            <option value="zh">Chinese (中文)</option>
+            <option value="id">Indonesian (Bahasa)</option>
+            <option value="tr">Turkish (Türkçe)</option>
+            <option value="vi">Vietnamese (Tiếng Việt)</option>
+            <option value="th">Thai (ไทย)</option>
+            <option value="fa">Persian (فارسی)</option>
+            <option value="nl">Dutch (Nederlands)</option>
+            <option value="pl">Polish (Polski)</option>
+            <option value="uk">Ukrainian (Українська)</option>
+            <option value="sv">Swedish (Svenska)</option>
+            <option value="no">Norwegian (Norsk)</option>
+            <option value="da">Danish (Dansk)</option>
+            <option value="fi">Finnish (Suomi)</option>
+            <option value="el">Greek (Ελληνικά)</option>
+            <option value="he">Hebrew (עברית)</option>
+            <option value="ro">Romanian (Română)</option>
+            <option value="hu">Hungarian (Magyar)</option>
+            <option value="cs">Czech (Čeština)</option>
+            <option value="sk">Slovak (Slovenčina)</option>
+            <option value="bg">Bulgarian (Български)</option>
+            <option value="hr">Croatian (Hrvatski)</option>
+            <option value="sr">Serbian (Српски)</option>
+            <option value="ms">Malay (Bahasa Melayu)</option>
+            <option value="tl">Tagalog / Filipino</option>
+            <option value="sw">Swahili (Kiswahili)</option>
+            <option value="af">Afrikaans</option>
+            <option value="ca">Catalan</option>
           </select>
         </div>
 
