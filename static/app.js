@@ -100,7 +100,7 @@ const historyCountBadge = document.getElementById('historyCountBadge');
 const serverConfigBtn = document.getElementById('serverConfigBtn');
 if (serverConfigBtn) {
   serverConfigBtn.addEventListener('click', () => {
-    const cur = localStorage.getItem('whisperflow_backend_url') || 'https://numerical-totally-dawn-editing.trycloudflare.com';
+    const cur = localStorage.getItem('whisperflow_backend_url') || 'https://youtube.minimaxtools.com';
     const next = prompt("Enter your Python / Colab Backend URL (HTTPS):\n(Leave default or update whenever Colab restarts)", cur);
     if (next !== null && next.trim()) {
       localStorage.setItem('whisperflow_backend_url', next.trim().replace(/\/$/, ''));
@@ -353,7 +353,7 @@ async function handleYouTubeUrl() {
     let audioBlobLoaded = false;
     let finalAudioBlob = null;
     let backendErrorMsg = '';
-    const backendUrl = localStorage.getItem('whisperflow_backend_url') || 'https://numerical-totally-dawn-editing.trycloudflare.com';
+    const backendUrl = localStorage.getItem('whisperflow_backend_url') || 'https://youtube.minimaxtools.com';
 
     if (backendUrl) {
       try {
