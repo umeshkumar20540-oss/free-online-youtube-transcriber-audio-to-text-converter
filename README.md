@@ -1,9 +1,12 @@
 # 🎙️ Online YouTube Transcriber & Audio-to-Text Converter (URLs, MP3, WAV, MP4)
 
+[![MiniMaxTools](https://img.shields.io/badge/Featured%20Partner-MiniMaxTools.com-ff5722?style=for-the-badge&logo=google-chrome)](https://tinyurl.com/4xtf9sye)
 [![GitHub Pages](https://img.shields.io/badge/Live%20App-Online%20YouTube%20Transcriber-6366f1?style=for-the-badge&logo=github)](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
 [![WebGPU](https://img.shields.io/badge/Hardware-WebGPU%20%2B%20WASM-10b981?style=for-the-badge&logo=webassembly)](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
+> 🌟 **Discover 100+ Free Online AI Tools**: Visit **[MiniMaxTools.com](https://tinyurl.com/4xtf9sye)** for free AI media converters, productivity web apps, and utilities!
+>
 > **🚀 Live Web App**: [https://umeshkumar20540-oss.github.io/youtube-transcriber/](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
 
 **Online YouTube Transcriber** is a free, high-performance web application for converting **YouTube URLs, video links, and audio uploads (MP3, WAV, M4A, MP4)** to text **100% directly inside your browser on your own GPU and CPU** using **Transformers.js (ONNX Runtime Web)** and **WebGPU**.
@@ -111,6 +114,13 @@ youtube-transcriber/
 ├── run.bat                  # 1-click Windows launcher
 └── run.ps1                  # PowerShell launcher
 ```
+
+---
+
+## 🌟 Discover 100+ More Free AI & Productivity Tools
+
+Looking for more free web applications, media tools, and AI utilities?
+👉 **Check out [MiniMaxTools.com](https://tinyurl.com/4xtf9sye)** for 100+ free online tools, converters, and generators!
 
 ---
 
