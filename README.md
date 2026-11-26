@@ -1,17 +1,17 @@
-# 🎙️ Online YouTube Transcriber & Audio-to-Text Converter (URLs, MP3, WAV, MP4)
+# 🎙️ Free Online YouTube Transcriber & Audio-to-Text Converter (URLs, MP3, WAV, MP4)
 
 [![MiniMaxTools](https://img.shields.io/badge/Featured%20Partner-MiniMaxTools.com-ff5722?style=for-the-badge&logo=google-chrome)](https://tinyurl.com/4xtf9sye)
-[![GitHub Pages](https://img.shields.io/badge/Live%20App-Online%20YouTube%20Transcriber-6366f1?style=for-the-badge&logo=github)](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
-[![WebGPU](https://img.shields.io/badge/Hardware-WebGPU%20%2B%20WASM-10b981?style=for-the-badge&logo=webassembly)](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
+[![GitHub Pages](https://img.shields.io/badge/Live%20App-Free%20Online%20YouTube%20Transcriber-6366f1?style=for-the-badge&logo=github)](https://umeshkumar20540-oss.github.io/free-online-youtube-transcriber-audio-to-text-converter/)
+[![WebGPU](https://img.shields.io/badge/Hardware-WebGPU%20%2B%20WASM-10b981?style=for-the-badge&logo=webassembly)](https://umeshkumar20540-oss.github.io/free-online-youtube-transcriber-audio-to-text-converter/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 > 🌟 **Discover 100+ Free Online AI Tools**: Visit **[MiniMaxTools.com](https://tinyurl.com/4xtf9sye)** for free AI media converters, productivity web apps, and utilities!
 >
-> **🚀 Live Web App**: [https://umeshkumar20540-oss.github.io/youtube-transcriber/](https://umeshkumar20540-oss.github.io/youtube-transcriber/)
+> **🚀 Live Web App**: [https://umeshkumar20540-oss.github.io/free-online-youtube-transcriber-audio-to-text-converter/](https://umeshkumar20540-oss.github.io/free-online-youtube-transcriber-audio-to-text-converter/)
 
-**Online YouTube Transcriber** is a free, high-performance web application for converting **YouTube URLs, video links, and audio uploads (MP3, WAV, M4A, MP4)** to text **100% directly inside your browser on your own GPU and CPU** using **Transformers.js (ONNX Runtime Web)** and **WebGPU**.
+**Free Online YouTube Transcriber & Audio-to-Text Converter** is a free, unlimited, privacy-first web and desktop application for converting **YouTube URLs, YouTube Shorts, video links, and audio/video files (MP3, WAV, M4A, AAC, MP4, WebM, FLAC)** to text & subtitles **100% directly on your own GPU and CPU** using **Whisper AI**, **Transformers.js (WebGPU/WASM)**, and **Faster-Whisper**.
 
-Audio and speech data **never leave your device**. No servers, no sign-ups, and no limits.
+Audio and speech data **never leave your device** for transcription. Supports **48+ languages** including English, Hindi, Urdu, Bengali, Tamil, Telugu, Marathi, Gujarati, Arabic, Spanish, French, German, Japanese, Korean, and Chinese.
 
 ---
 
@@ -51,35 +51,37 @@ Audio and speech data **never leave your device**. No servers, no sign-ups, and 
 ## 🌐 Run Online (GitHub Pages)
 
 Open the live URL in any modern browser (Chrome, Edge, Brave, Arc, Safari, Firefox):
-👉 **[https://umeshkumar20540-oss.github.io/youtube-transcriber/](https://umeshkumar20540-oss.github.io/youtube-transcriber/)**
+👉 **[https://umeshkumar20540-oss.github.io/free-online-youtube-transcriber-audio-to-text-converter/](https://umeshkumar20540-oss.github.io/free-online-youtube-transcriber-audio-to-text-converter/)**
 
-1. Paste a **YouTube URL**, drop an **MP3 / WAV / MP4 file**, or click **"1-Click Test Demo"**.
-2. Select your desired Whisper model (`Tiny`, `Base`, or `Small`).
+1. Paste a **YouTube URL / Shorts**, drop an **MP3 / WAV / M4A / MP4 file**, or click **"1-Click Test Demo"**.
+2. Listen to the **Audio Preview** to verify your audio, and pick your **Language** (48+ languages including English, Hindi, Spanish, Arabic, etc.) and **Whisper Model** (`Tiny`, `Base`, or `Small`).
 3. Click **"Start Transcription"**.
-4. Your device's GPU (via WebGPU) or CPU (via WASM) will transcribe the speech locally in seconds!
+4. Your device's GPU (via WebGPU) or CPU (via WASM) transcribes the speech locally with live streaming text!
 
 ---
 
-## 💻 Optional: Local Python Server & CLI
+## 💻 Download & Run Offline on Your PC (Windows / Mac / Linux)
 
-You can also run WhisperFlow as a local desktop backend using **Faster-Whisper (CTranslate2)**:
+Run the full desktop/local version on your own PC with **no external backend**:
 
 ### 1. Requirements
-- Python 3.9+
+- Python 3.10+
 - NVIDIA GPU with CUDA (optional, automatic CPU fallback)
 
 ### 2. Installation
 ```bash
-git clone https://github.com/umeshkumar20540-oss/youtube-transcriber.git
-cd youtube-transcriber
+git clone https://github.com/umeshkumar20540-oss/free-online-youtube-transcriber-audio-to-text-converter.git
+cd free-online-youtube-transcriber-audio-to-text-converter
 pip install -r requirements.txt
 ```
 
-### 3. Launch Local Server
-```bash
-python main.py
-```
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser.
+### 3. Launch Local App (1-Click on Windows)
+- **Windows:** Double-click `run.bat`
+- **Mac / Linux / Terminal:**
+  ```bash
+  python main.py
+  ```
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. Everything (YouTube audio download + AI transcription) runs 100% locally on your own PC!
 
 ### 4. Standalone CLI Usage
 ```bash
